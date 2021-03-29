@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Анастасия Агеева](https://up.htmlacademy.ru/ecmascript/14/user/1584775).
-* Наставник: `Неизвестно`.
+* Наставник: [Дмитрий Гуляев](https://htmlacademy.ru/profile/dima).
 
 ---
 
