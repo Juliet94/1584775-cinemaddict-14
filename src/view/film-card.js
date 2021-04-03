@@ -1,3 +1,5 @@
+import {getCommentLength} from '../utils';
+
 export const createFilmCardTemplate = (filmCard) => {
 
   const DESC_LENGTH = 140;
@@ -10,7 +12,7 @@ export const createFilmCardTemplate = (filmCard) => {
     rate,
     production,
     duration,
-    genre,
+    genres,
     isWatched,
     isFavorite,
     isInWatchlist,
@@ -25,17 +27,13 @@ export const createFilmCardTemplate = (filmCard) => {
     return desc.trim() + '...';
   };
 
-  const getCommentLength = (comments) => {
-    return Object.keys(comments).length;
-  };
-
   return `<article class="film-card">
           <h3 class="film-card__title">${title}</h3>
           <p class="film-card__rating">${rate}</p>
           <p class="film-card__info">
-            <span class="film-card__year">${production}</span>
+            <span class="film-card__year">${production.slice(-4)}</span>
             <span class="film-card__duration">${duration}</span>
-            <span class="film-card__genre">${genre[0]}</span>
+            <span class="film-card__genre">${genres[0]}</span>
           </p>
           <img src="./images/posters/${poster}" alt="" class="film-card__poster">
           <p class="film-card__description">${description.length >= DESC_LENGTH ? cutDescription(description) : description}</p>

@@ -19,4 +19,8 @@ const getRandomArray = (elements, length = elements.length) => {
   return similarArray.filter((item, index) => similarArray.indexOf(item) === index);
 };
 
-export {getRandomInteger,getRandomFloat, getRandomArrayElement, getRandomArray};
+const getCommentLength = (comments) => {
+  return Object.keys(comments).length;
+};
+
+export {getRandomInteger,getRandomFloat, getRandomArrayElement, getRandomArray, getCommentLength};

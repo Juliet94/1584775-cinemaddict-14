@@ -19,11 +19,12 @@ const POSTERS = [
   'the-great-flamarion.jpg',
   'the-man-with-the-golden-arm.jpg',
 ];
-
 const GENRES = ['Romance', 'Drama', 'Comedy', 'Musical', 'Horror', 'Cartoon', ' Mystery', 'Western'];
 const NAMES = ['John Doe', 'Jane Doe', 'John Roe', 'Jane Roe'];
 const EMOTION = ['angry.png', 'puke.png', 'sleeping.png', 'smile.png'];
 const COMMENT_COUNT = 5;
+const COUNTRIES = ['USA', 'Russia', 'France', 'England', 'Germany'];
+const AGE_MAX = 18;
 const Description = {
   DESCRIPTIONS : ['Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     'Cras aliquet varius magna, non porta ligula feugiat eget.',
@@ -38,16 +39,15 @@ const Description = {
   ],
   DESC_COUNT : 5,
 };
-const ProductionYear = {
-  MIN : 1930,
-  MAX : 2020,
-};
-
 const FilmDuration = {
   MIN_H : 0,
   MAX_H: 3,
   MIN_M: 5,
   MAX_M: 59,
+};
+const ReleaseDate = {
+  YEAR: [dayjs().year(), 1900],
+  MONTH: [11, 0],
 };
 
 const getFilmDuration =() => {
@@ -56,6 +56,14 @@ const getFilmDuration =() => {
 
 const getCommentDate = () => {
   return dayjs().format('YYYY[/]/MM[/]DD HH[:]mm');
+};
+
+const getReleaseDate = () => {
+  const year = getRandomInteger(...ReleaseDate.YEAR);
+  const month = getRandomInteger(...ReleaseDate.MONTH);
+  const day = getRandomInteger(dayjs(month).daysInMonth());
+
+  return dayjs(new Date(year, month, day)).format('DD MMMM YYYY');
 };
 
 const generateComment = () => {
@@ -74,13 +82,18 @@ const generateFilmCard = () => {
     poster: getRandomArrayElement(POSTERS),
     description: getRandomArray(Description.DESCRIPTIONS, Description.DESC_COUNT).join(' '),
     rate: getRandomFloat(),
-    production: getRandomInteger(ProductionYear.MIN, ProductionYear.MAX),
+    production: getReleaseDate(),
     duration: getFilmDuration(),
-    genre : getRandomArray(GENRES),
+    genres : getRandomArray(GENRES),
     isWatched : Boolean(getRandomInteger()),
     isFavorite : Boolean(getRandomInteger()),
     isInWatchlist : Boolean(getRandomInteger()),
     comments : new Array(getRandomInteger(0, COMMENT_COUNT)).fill().map(generateComment),
+    director: getRandomArrayElement(NAMES),
+    writers : getRandomArray(NAMES),
+    actors: getRandomArray(NAMES),
+    country: getRandomArrayElement(COUNTRIES),
+    age: getRandomInteger(0, AGE_MAX),
   };
 };
 

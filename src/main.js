@@ -7,7 +7,9 @@ import {createButtonShowMoreTemplate} from './view/button-show-more';
 import {createFilmsListExtraTemplate} from './view/films-list-extra';
 import {createFooterStatisticsTemplate} from './view/footer';
 import {createPopupTemplate} from './view/popup';
+import {createCommentTemplate} from './view/comment';
 import {generateFilmCard} from './mock/film-card';
+import {getCommentLength} from './utils';
 
 const Title = {
   RATE : 'Top rated',
@@ -64,4 +66,10 @@ for (let i = 0; i < TaskCount.EXTRA; i++) {
 }
 
 render(siteFooterElement, createFooterStatisticsTemplate());
-render(siteFooterElement, createPopupTemplate(), 'afterend');
+render(siteFooterElement, createPopupTemplate(filmCards[0]), 'afterend');
+
+const commentListElement = document.querySelector('.film-details__comments-list');
+
+for (let i = 0; i < getCommentLength(filmCards[0].comments); i++) {
+  render(commentListElement, createCommentTemplate(filmCards[0].comments[i]));
+}
