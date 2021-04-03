@@ -7,6 +7,7 @@ import {createButtonShowMoreTemplate} from './view/button-show-more';
 import {createFilmsListExtraTemplate} from './view/films-list-extra';
 import {createFooterStatisticsTemplate} from './view/footer';
 import {createPopupTemplate} from './view/popup';
+import {generateFilmCard} from './mock/film-card';
 
 const Title = {
   RATE : 'Top rated',
@@ -19,9 +20,12 @@ const AdditionalClass = {
 };
 
 const TaskCount = {
-  CONTENT : '5',
-  EXTRA : '2',
+  CONTENT : 5,
+  EXTRA : 2,
+  PER_STEP : 5,
 };
+
+const filmCards = new Array(TaskCount.CONTENT).fill().map(generateFilmCard);
 
 const render = (container, template, place = 'beforeend') => {
   container.insertAdjacentHTML(place, template);
@@ -41,7 +45,7 @@ const filmsListElement = filmsElement.querySelector('.films-list');
 const filmsListContainerElement = filmsListElement.querySelector('.films-list__container');
 
 for (let i = 0; i < TaskCount.CONTENT; i++) {
-  render(filmsListContainerElement, createFilmCardTemplate());
+  render(filmsListContainerElement, createFilmCardTemplate(filmCards[i]));
 }
 
 render(filmsListElement, createButtonShowMoreTemplate());
@@ -52,11 +56,11 @@ const filmsListRatedElement = filmsElement.querySelector('.films-list__container
 const filmsListCommentedElement = filmsElement.querySelector('.films-list__container--commented');
 
 for (let i = 0; i < TaskCount.EXTRA; i++) {
-  render(filmsListRatedElement, createFilmCardTemplate());
+  render(filmsListRatedElement, createFilmCardTemplate(filmCards[i]));
 }
 
 for (let i = 0; i < TaskCount.EXTRA; i++) {
-  render(filmsListCommentedElement, createFilmCardTemplate());
+  render(filmsListCommentedElement, createFilmCardTemplate(filmCards[i]));
 }
 
 render(siteFooterElement, createFooterStatisticsTemplate());
