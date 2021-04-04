@@ -10,6 +10,8 @@ import {createPopupTemplate} from './view/popup';
 import {createCommentTemplate} from './view/comment';
 import {generateFilmCard} from './mock/film-card';
 import {getCommentLength} from './utils';
+import {generateFilters} from './mock/filter';
+import {generateUserRank} from './mock/user-rank';
 
 const Title = {
   RATE : 'Top rated',
@@ -28,6 +30,8 @@ const TaskCount = {
 };
 
 const filmCards = new Array(TaskCount.CONTENT).fill().map(generateFilmCard);
+const filters = generateFilters(filmCards);
+const userRank = generateUserRank(filmCards);
 
 const render = (container, template, place = 'beforeend') => {
   container.insertAdjacentHTML(place, template);
@@ -37,8 +41,8 @@ const siteMainElement = document.querySelector('.main');
 const siteHeaderElement = document.querySelector('.header');
 const siteFooterElement = document.querySelector('.footer');
 
-render(siteHeaderElement, createUserRatingTemplate());
-render(siteMainElement, createMenuTemplate());
+render(siteHeaderElement, createUserRatingTemplate(userRank));
+render(siteMainElement, createMenuTemplate(filters));
 render(siteMainElement, createFilterTemplate());
 render(siteMainElement, createFilmsListTemplate());
 
