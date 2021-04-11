@@ -1,6 +1,6 @@
-import {getCommentLength} from '../utils';
+import {createElement, getCommentLength} from '../utils';
 
-export const createPopupTemplate = (filmCard) => {
+const createPopupTemplate = (filmCard) => {
 
   const {
     title,
@@ -21,7 +21,7 @@ export const createPopupTemplate = (filmCard) => {
     age,
   } = filmCard;
 
-  return `<section class="film-details visually-hidden">
+  return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="film-details__top-container">
       <div class="film-details__close">
@@ -138,3 +138,26 @@ export const createPopupTemplate = (filmCard) => {
   </form>
 </section>`;
 };
+
+export default class Popup {
+  constructor(filmCard) {
+    this._filmCard = filmCard;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPopupTemplate(this._filmCard);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

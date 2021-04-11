@@ -1,6 +1,6 @@
-import {getCommentLength} from '../utils';
+import {getCommentLength, createElement} from '../utils';
 
-export const createFilmCardTemplate = (filmCard) => {
+const createFilmCardTemplate = (filmCard) => {
 
   const DESC_LENGTH = 140;
   const ACTIVE_CLASS = 'film-card__controls-item--active';
@@ -45,3 +45,26 @@ export const createFilmCardTemplate = (filmCard) => {
           </div>
         </article>`;
 };
+
+export default class FilmCard {
+  constructor(filmCard) {
+    this._filmCard = filmCard;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmCardTemplate(this._filmCard);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
