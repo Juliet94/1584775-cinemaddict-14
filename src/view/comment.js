@@ -1,4 +1,6 @@
-export const createCommentTemplate = (comments) => {
+import {createElement} from '../utils';
+
+const createCommentTemplate = (comments) => {
 
   const {
     text,
@@ -21,3 +23,26 @@ export const createCommentTemplate = (comments) => {
             </div>
           </li>`;
 };
+
+export default class Comment {
+  constructor(comments) {
+    this._comments = comments;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCommentTemplate(this._comments);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
