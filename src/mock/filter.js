@@ -15,11 +15,11 @@ const filterTypes = {
     text: 'Watchlist',
   },
   [filterTypeNames.HISTORY]: {
-    link: '#watchilst',
+    link: '#history',
     text: 'History',
   },
   [filterTypeNames.FAVORITES]: {
-    link: '#watchilst',
+    link: '#favorites',
     text: 'Favorites',
   },
 };
