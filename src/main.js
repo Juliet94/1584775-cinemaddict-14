@@ -5,7 +5,7 @@ import FilmsListView from './view/films-list';
 import FilmCardView from './view/film-card';
 import ButtonShowMoreView from './view/button-show-more';
 import FilmsListExtraView from './view/films-list-extra';
-import FooterStatisticsView from './view/footer';
+import FooterStatisticsView from './view/footer-statistics';
 import PopupView from './view/popup';
 import CommentView from './view/comment';
 import {generateFilmCard} from './mock/film-card';
@@ -69,7 +69,15 @@ const createPopup = (filmCard) => {
     siteBodyElement.classList.remove('hide-overflow');
   };
 
+  const onEscButtonClose = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      onClickButtonClose(evt);
+      document.removeEventListener('keydown', onEscButtonClose);
+    }
+  };
+
   closeButton.addEventListener('click', onClickButtonClose);
+  document.addEventListener('keydown', onEscButtonClose);
 };
 
 const addListenersOnFilmCard = (filmComponent, filmCard) => {
