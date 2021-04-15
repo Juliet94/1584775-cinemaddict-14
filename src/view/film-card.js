@@ -1,4 +1,4 @@
-import {getCommentLength} from '../utils';
+import {getCommentLength} from '../utils/common';
 import AbstractView from './abstract';
 
 const createFilmCardTemplate = (filmCard) => {
@@ -51,9 +51,22 @@ export default class FilmCard extends AbstractView {
   constructor(filmCard) {
     super();
     this._filmCard = filmCard;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createFilmCardTemplate(this._filmCard);
+  }
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click(this._filmCard);
+  }
+
+  setClickHandler(callback) {
+    this._callback.click = callback;
+
+    this.getElement().querySelector('.film-card__poster').addEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.film-card__title').addEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.film-card__comments').addEventListener('click', this._clickHandler);
   }
 }

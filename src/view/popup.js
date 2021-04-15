@@ -1,4 +1,4 @@
-import {getCommentLength} from '../utils';
+import {getCommentLength} from '../utils/common';
 import AbstractView from './abstract';
 
 const createPopupTemplate = (filmCard) => {
@@ -144,9 +144,21 @@ export default class Popup extends AbstractView {
   constructor(filmCard) {
     super();
     this._filmCard = filmCard;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createPopupTemplate(this._filmCard);
+  }
+
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
+  }
+
+  setClickHandler(callback) {
+    this._callback.click = callback;
+
+    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._clickHandler);
   }
 }
