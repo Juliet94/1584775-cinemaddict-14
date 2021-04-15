@@ -1,4 +1,5 @@
-import {getCommentLength, createElement} from '../utils';
+import {getCommentLength} from '../utils';
+import AbstractView from './abstract';
 
 const createFilmCardTemplate = (filmCard) => {
 
@@ -46,25 +47,13 @@ const createFilmCardTemplate = (filmCard) => {
         </article>`;
 };
 
-export default class FilmCard {
+export default class FilmCard extends AbstractView {
   constructor(filmCard) {
+    super();
     this._filmCard = filmCard;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmCardTemplate(this._filmCard);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

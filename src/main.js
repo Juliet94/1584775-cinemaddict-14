@@ -26,7 +26,7 @@ const AdditionalClass = {
 };
 
 const TaskCount = {
-  CONTENT : 0,
+  CONTENT : 23,
   EXTRA : 2,
   PER_STEP : 5,
 };

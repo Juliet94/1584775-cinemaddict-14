@@ -1,4 +1,5 @@
-import {createElement, getCommentLength} from '../utils';
+import {getCommentLength} from '../utils';
+import AbstractView from './abstract';
 
 const createPopupTemplate = (filmCard) => {
 
@@ -139,25 +140,13 @@ const createPopupTemplate = (filmCard) => {
 </section>`;
 };
 
-export default class Popup {
+export default class Popup extends AbstractView {
   constructor(filmCard) {
+    super();
     this._filmCard = filmCard;
-    this._element = null;
   }
 
   getTemplate() {
     return createPopupTemplate(this._filmCard);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
