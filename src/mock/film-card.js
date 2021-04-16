@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {getRandomInteger, getRandomFloat, getRandomArrayElement, getRandomArray} from '../utils.js';
+import {getRandomInteger, getRandomFloat, getRandomArrayElement, getRandomArray} from '../utils/common';
 
 const FILM_TITLES = [
   'Made for Each Other',
