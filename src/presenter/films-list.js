@@ -6,14 +6,9 @@ import FilmsListExtraView from '../view/films-list-extra';
 import PopupView from '../view/popup';
 import CommentView from '../view/comment';
 import NoFilmView from '../view/no-film';
-import {render, remove, RenderPosition} from '../utils/render';
-import {getCommentLength} from '../utils/common';
-
-const TaskCount = {
-  CONTENT : 23,
-  EXTRA : 2,
-  PER_STEP : 5,
-};
+import {render, remove, replace, RenderPosition} from '../utils/render';
+import {getCommentLength, updateItem} from '../utils/common';
+import {TaskCount} from '../const';
 
 const Title = {
   RATE : 'Top rated',
@@ -28,10 +23,21 @@ const AdditionalClass = {
 export default class FilmsList {
   constructor(filmsListContainer) {
     this._filmsListContainer = filmsListContainer;
+    this._renderedTaskCount = TaskCount.PER_STEP;
+    this._renderedFilmCards = {};
 
     this._filmsListComponent = new FilmsListView();
     this._sortComponent = new SortView();
     this._noFilmComponent = new NoFilmView();
+    this._buttonShowMoreComponent = new ButtonShowMoreView();
+
+    this._filmCardElement = null;
+    this._popupComponent = null;
+
+    this._handleButtonShowMoreClick = this._handleButtonShowMoreClick.bind(this);
+    this._handleButtonWatchlistClick = this._handleButtonWatchlistClick.bind(this);
+    this._handleButtonWatchedClick = this._handleButtonWatchedClick.bind(this);
+    this._handleButtonFavoriteClick = this._handleButtonFavoriteClick.bind(this);
 
     this._filmsListElement = this._filmsListComponent.getElement().querySelector('.films-list');
     this._filmsListContainerElement = this._filmsListComponent.getElement().querySelector('.films-list__container');
@@ -47,12 +53,33 @@ export default class FilmsList {
     render(this._filmsListContainer, this._sortComponent);
   }
 
-  _renderFilmCards() {
-    for (let i = 0; i < TaskCount.PER_STEP; i++) {
-      const filmCard = new FilmCardView(this._filmCards[i]);
-      render(this._filmsListContainerElement, filmCard);
-      filmCard.setClickHandler(this._renderPopup);
-    }
+  _renderFilmCard(filmCard) {
+    const filmComponent = this._createFilmComponent(filmCard);
+
+    render(this._filmsListContainerElement, filmComponent);
+
+    this._renderedFilmCards[filmCard.id] = filmComponent;
+  }
+
+  _createFilmComponent(filmCard) {
+
+    this._filmCardElement = new FilmCardView(filmCard);
+
+    this._filmCardElement.setOpenPopupClickHandler(() => this._renderPopup(filmCard));
+    this._filmCardElement.setWatchlistClickHandler(() => this._handleButtonWatchlistClick(filmCard));
+    this._filmCardElement.setWatchedClickHandler(() => this._handleButtonWatchedClick(filmCard));
+    this._filmCardElement.setFavoriteClickHandler(() => this._handleButtonFavoriteClick(filmCard));
+
+    return this._filmCardElement;
+  }
+
+  _renderFilmCards(from, to) {
+
+    this._filmCards
+      .slice(from, to)
+      .forEach((filmCard) => {
+        this._renderFilmCard(filmCard);
+      });
 
     if (this._filmCards.length > TaskCount.PER_STEP) {
       this._renderButtonShowMore();
@@ -63,28 +90,21 @@ export default class FilmsList {
     render(this._filmsListContainer, this._noFilmComponent);
   }
 
+  _handleButtonShowMoreClick() {
+
+    this._renderFilmCards(this._renderedTaskCount, this._renderedTaskCount + TaskCount.PER_STEP);
+    this._renderedTaskCount += TaskCount.PER_STEP;
+
+    if (this._renderedTaskCount >= this._filmCards.length) {
+      remove(this._buttonShowMoreComponent);
+    }
+  }
+
   _renderButtonShowMore() {
-    let renderedFilmCount = TaskCount.PER_STEP;
 
-    const buttonShowMoreComponent = new ButtonShowMoreView();
+    render(this._filmsListElement, this._buttonShowMoreComponent);
 
-    render(this._filmsListElement, buttonShowMoreComponent);
-
-    buttonShowMoreComponent.setClickHandler(() => {
-      this._filmCards
-        .slice(renderedFilmCount, renderedFilmCount + TaskCount.PER_STEP)
-        .forEach((filmCard) => {
-          const newFilmCard = new FilmCardView(filmCard);
-          render(this._filmsListContainerElement, newFilmCard);
-          newFilmCard.setClickHandler(this._renderPopup);
-        });
-
-      renderedFilmCount += TaskCount.PER_STEP;
-
-      if (renderedFilmCount >= this._filmCards.length) {
-        remove(buttonShowMoreComponent);
-      }
-    });
+    this._buttonShowMoreComponent.setClickHandler(this._handleButtonShowMoreClick);
   }
 
   _renderFilmsList() {
@@ -92,7 +112,7 @@ export default class FilmsList {
     if (this._filmCards.length !== 0) {
       this._renderSort();
       render(this._filmsListContainer, this._filmsListComponent);
-      this._renderFilmCards();
+      this._renderFilmCards(0, TaskCount.PER_STEP);
       this._renderFilmsListExtra();
     } else {
       this._renderNoFilm();
@@ -110,24 +130,37 @@ export default class FilmsList {
     const filmsListCommentedElement = this._filmsElement.querySelector('.films-list__container--commented');
 
     for (let i = 0; i < TaskCount.EXTRA; i++) {
-      const filmCard = new FilmCardView(this._filmCards[i]);
-      render(filmsListRatedElement, filmCard);
-      filmCard.setClickHandler(this._renderPopup);
+      this._filmCardElement = new FilmCardView(this._filmCards[i]);
+      render(filmsListRatedElement, this._filmCardElement);
+      this._filmCardElement.setOpenPopupClickHandler(this._renderPopup);
     }
 
     for (let i = 0; i < TaskCount.EXTRA; i++) {
-      const filmCard = new FilmCardView(this._filmCards[i]);
-      render(filmsListCommentedElement, filmCard);
-      filmCard.setClickHandler(this._renderPopup);
+      this._filmCardElement = new FilmCardView(this._filmCards[i]);
+      render(filmsListCommentedElement, this._filmCardElement);
+      this._filmCardElement.setOpenPopupClickHandler(this._renderPopup);
     }
   }
 
   _renderPopup(filmCard) {
 
-    this._popupComponent = new PopupView(filmCard);
-
     const siteFooterElement = document.querySelector('.footer');
     const siteBodyElement = document.querySelector('body');
+
+    const removePopup = () => {
+      siteBodyElement.classList.remove('hide-overflow');
+      remove(this._popupComponent);
+    };
+
+    if (this._popupComponent) {
+      removePopup();
+    }
+
+    this._popupComponent = new PopupView(filmCard);
+
+    this._popupComponent.setWatchlistClickHandler(() => this._handleButtonWatchlistClick(filmCard));
+    this._popupComponent.setWatchedClickHandler(() => this._handleButtonWatchedClick(filmCard));
+    this._popupComponent.setFavoriteClickHandler(() => this._handleButtonFavoriteClick(filmCard));
 
     render(siteFooterElement, this._popupComponent, RenderPosition.AFTERBEGIN);
 
@@ -139,11 +172,6 @@ export default class FilmsList {
       render(commentListElement, new CommentView(filmCard.comments[i]));
     }
 
-    const removePopup = () => {
-      siteBodyElement.classList.remove('hide-overflow');
-      remove(this._popupComponent);
-    };
-
     const onEscButtonClose = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
@@ -153,7 +181,39 @@ export default class FilmsList {
       }
     };
 
-    this._popupComponent.setClickHandler(removePopup);
+    this._popupComponent.setClickButtonCloseHandler(removePopup);
     document.addEventListener('keydown', onEscButtonClose);
+  }
+
+  _handleButtonWatchlistClick(filmCard) {
+
+    filmCard.isInWatchlist = !filmCard.isInWatchlist;
+    this._handleFilmUpdate(filmCard);
+  }
+
+  _handleButtonWatchedClick(filmCard) {
+
+    filmCard.isWatched = !filmCard.isWatched;
+    this._handleFilmUpdate(filmCard);
+  }
+
+  _handleButtonFavoriteClick(filmCard) {
+
+    filmCard.isFavorite = !filmCard.isFavorite;
+    this._handleFilmUpdate(filmCard);
+  }
+
+  _handleFilmUpdate(updatedFilm) {
+    this._filmCards = updateItem(this._filmCards, updatedFilm);
+    this._replaceFilm(updatedFilm);
+  }
+
+  _replaceFilm(film) {
+    if (this._renderedFilmCards[film.id]) {
+      const filmCardComponent = this._createFilmComponent(film);
+
+      replace(filmCardComponent, this._renderedFilmCards[film.id]);
+      this._renderedFilmCards[film.id] = filmCardComponent;
+    }
   }
 }

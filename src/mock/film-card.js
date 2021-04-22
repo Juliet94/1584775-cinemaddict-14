@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 import {getRandomInteger, getRandomFloat, getRandomArrayElement, getRandomArray} from '../utils/common';
 
 const FILM_TITLES = [
@@ -78,6 +79,7 @@ const generateComment = () => {
 const generateFilmCard = () => {
 
   return {
+    id: nanoid(),
     title: getRandomArrayElement(FILM_TITLES),
     poster: getRandomArrayElement(POSTERS),
     description: getRandomArray(Description.DESCRIPTIONS, Description.DESC_COUNT).join(' '),
