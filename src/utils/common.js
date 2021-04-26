@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export const getRandomNumber = (min, max) => {
   return Math.random() * (max - min + 1) + min;
 };
@@ -35,4 +37,12 @@ export const updateItem = (items, update) => {
     update,
     ...items.slice(index + 1),
   ];
+};
+
+export const sortByRating = (cardA, cardB) => {
+  return (cardB.rate) - (cardA.rate);
+};
+
+export const sortByDate = (cardA, cardB) => {
+  return dayjs(cardB.production).diff(dayjs(cardA.production));
 };

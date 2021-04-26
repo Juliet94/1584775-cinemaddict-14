@@ -1,8 +1,8 @@
-// export const SortType = {
-//   DEFAULT: 'default',
-//   DATE: 'date',
-//   RATING: 'rating',
-// };
+export const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};
 
 export const TaskCount = {
   CONTENT : 23,
