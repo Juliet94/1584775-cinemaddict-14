@@ -190,15 +190,14 @@ export default class FilmsList {
     this._popupComponent.setWatchedClickHandler(() => this._handleButtonWatchedClick(filmCard));
     this._popupComponent.setFavoriteClickHandler(() => this._handleButtonFavoriteClick(filmCard));
 
+    this._popupComponent.setClickButtonCloseHandler(removePopup);
+
     render(siteFooterElement, this._popupComponent, RenderPosition.AFTERBEGIN);
 
     siteBodyElement.classList.add('hide-overflow');
 
-    const commentListElement = this._popupComponent.getElement().querySelector('.film-details__comments-list');
-
-    for (let i = 0; i < getCommentLength(filmCard.comments); i++) {
-      render(commentListElement, new CommentView(filmCard.comments[i]));
-    }
+    this._renderComments(filmCard);
+    this._popupComponent.setEmojiChangeHandler(() => this._renderComments(filmCard));
 
     const onEscButtonClose = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -209,8 +208,16 @@ export default class FilmsList {
       }
     };
 
-    this._popupComponent.setClickButtonCloseHandler(removePopup);
     document.addEventListener('keydown', onEscButtonClose);
+  }
+
+  _renderComments(filmCard) {
+
+    const commentListElement = this._popupComponent.getElement().querySelector('.film-details__comments-list');
+
+    for (let i = 0; i < getCommentLength(filmCard.comments); i++) {
+      render(commentListElement, new CommentView(filmCard.comments[i]));
+    }
   }
 
   _handleButtonWatchlistClick(filmCard) {

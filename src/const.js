@@ -9,3 +9,10 @@ export const TaskCount = {
   EXTRA : 2,
   PER_STEP : 5,
 };
+
+export const Emoji = {
+  SMILE: 'smile',
+  SLEEPING: 'sleeping',
+  PUKE: 'puke',
+  ANGRY: 'angry',
+};
