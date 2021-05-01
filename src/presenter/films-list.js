@@ -6,6 +6,7 @@ import FilmsListExtraView from '../view/films-list-extra';
 import PopupView from '../view/popup';
 import CommentView from '../view/comment';
 import NoFilmView from '../view/no-film';
+import NewCommentView from '../view/new-comment';
 import {render, remove, replace, RenderPosition} from '../utils/render';
 import {getCommentLength, updateItem, sortByRating, sortByDate} from '../utils/common';
 import {TaskCount, SortType} from '../const';
@@ -34,6 +35,7 @@ export default class FilmsList {
 
     this._filmCardElement = null;
     this._popupComponent = null;
+    this._newCommentComponent = null;
 
     this._handleButtonShowMoreClick = this._handleButtonShowMoreClick.bind(this);
     this._handleButtonWatchlistClick = this._handleButtonWatchlistClick.bind(this);
@@ -190,15 +192,13 @@ export default class FilmsList {
     this._popupComponent.setWatchedClickHandler(() => this._handleButtonWatchedClick(filmCard));
     this._popupComponent.setFavoriteClickHandler(() => this._handleButtonFavoriteClick(filmCard));
 
+    this._popupComponent.setClickButtonCloseHandler(removePopup);
+
     render(siteFooterElement, this._popupComponent, RenderPosition.AFTERBEGIN);
 
     siteBodyElement.classList.add('hide-overflow');
 
-    const commentListElement = this._popupComponent.getElement().querySelector('.film-details__comments-list');
-
-    for (let i = 0; i < getCommentLength(filmCard.comments); i++) {
-      render(commentListElement, new CommentView(filmCard.comments[i]));
-    }
+    this._renderComments(filmCard);
 
     const onEscButtonClose = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -209,8 +209,22 @@ export default class FilmsList {
       }
     };
 
-    this._popupComponent.setClickButtonCloseHandler(removePopup);
     document.addEventListener('keydown', onEscButtonClose);
+  }
+
+  _renderComments(filmCard) {
+
+    this._newCommentComponent = new NewCommentView(filmCard);
+
+    const commentListElement = this._popupComponent.getElement().querySelector('.film-details__comments-list');
+    const commentsWrapperElement = this._popupComponent.getElement().querySelector('.film-details__comments-wrap');
+
+    for (let i = 0; i < getCommentLength(filmCard.comments); i++) {
+      render(commentListElement, new CommentView(filmCard.comments[i]));
+    }
+
+    render(commentsWrapperElement, this._newCommentComponent);
+    this._newCommentComponent.setEmojiChangeHandler();
   }
 
   _handleButtonWatchlistClick(filmCard) {
