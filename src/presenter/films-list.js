@@ -7,9 +7,11 @@ import PopupView from '../view/popup';
 import CommentView from '../view/comment';
 import NoFilmView from '../view/no-film';
 import NewCommentView from '../view/new-comment';
+
 import {render, remove, replace, RenderPosition} from '../utils/render';
 import {getCommentLength, sortByRating, sortByDate} from '../utils/common';
 import {FilmCount, SortType, UserAction, UpdateType} from '../const';
+import {filter} from '../utils/filter';
 
 const Title = {
   RATE : 'Top rated',
@@ -22,9 +24,10 @@ const AdditionalClass = {
 };
 
 export default class FilmsList {
-  constructor(filmsListContainer, filmsModel) {
+  constructor(filmsListContainer, filterModel, filmsModel) {
 
     this._filmsModel = filmsModel;
+    this._filterModel = filterModel;
 
     this._filmsListContainer = filmsListContainer;
     this._renderedTaskCount = FilmCount.PER_STEP;
@@ -56,19 +59,25 @@ export default class FilmsList {
   init() {
 
     this._filmsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
 
     this._renderFilmsList();
   }
 
   _getFilms() {
+
+    const filterType = this._filterModel.getFilter();
+    const films = this._filmsModel.getFilms().slice();
+    const filteredFilms = filter[filterType](films);
+
     switch (this._currentSortType) {
       case SortType.DATE:
-        return this._filmsModel.getFilms().slice().sort(sortByDate);
+        return filteredFilms.sort(sortByDate);
       case  SortType.RATING:
-        return this._filmsModel.getFilms().slice().sort(sortByRating);
+        return filteredFilms.sort(sortByRating);
     }
 
-    return this._filmsModel.getFilms();
+    return filteredFilms;
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -82,19 +91,17 @@ export default class FilmsList {
 
   _handleModelEvent(updateType, data) {
 
-    const filmCount = this._getFilms().length;
-
     switch (updateType) {
       case UpdateType.PATCH:
         this._replaceFilm(data);
         break;
       case UpdateType.MINOR:
         this._clearFilmList();
-        this._renderFilmCards(this._getFilms().slice(0, Math.min(filmCount, FilmCount.PER_STEP)));
+        this._renderFilmCards();
         break;
       case UpdateType.MAJOR:
         this._clearFilmList({resetShownMoviesCount: true, resetSortType: true});
-        this._renderFilmCards(this._getFilms().slice(0, Math.min(filmCount, FilmCount.PER_STEP)));
+        this._renderFilmCards();
         break;
     }
   }
@@ -106,8 +113,7 @@ export default class FilmsList {
 
   _clearFilmList({resetRenderedFilmsCount = false, resetSortType = false} = {}) {
     Object.values(this._renderedFilmCards).forEach((filmCard) => {
-      filmCard.getElement().remove();
-      filmCard.removeElement();
+      remove(filmCard);
     });
 
     if (resetRenderedFilmsCount) {
@@ -116,14 +122,13 @@ export default class FilmsList {
 
     if (resetSortType) {
 
-      const previousSorComponent = this._sortComponent;
+      const previousSortComponent = this._sortComponent;
 
       this._sortComponent = new SortView();
       this._currentSortType = SortType.DEFAULT;
 
-      replace(this._sortComponent, previousSorComponent);
-      previousSorComponent.getElement().remove();
-      previousSorComponent.removeElement();
+      replace(this._sortComponent, previousSortComponent);
+      remove(previousSortComponent);
 
       this._sortComponent.setSortTypeClickHandler(this._handleSortTypeClick);
     }
@@ -151,7 +156,7 @@ export default class FilmsList {
     return this._filmCardElement;
   }
 
-  _renderFilmCards(filmCards) {
+  _renderFilmCards(filmCards = this._getFilms().slice(0, Math.min(this._getFilms().length, FilmCount.PER_STEP))) {
 
     const filmCount = this._getFilms().length;
 
@@ -194,7 +199,7 @@ export default class FilmsList {
     if (filmCount !== 0) {
       this._renderSort();
       render(this._filmsListContainer, this._filmsListComponent);
-      this._renderFilmCards(this._getFilms().slice(0, Math.min(filmCount, FilmCount.PER_STEP)));
+      this._renderFilmCards();
       this._renderFilmsListExtra();
     } else {
       this._renderNoFilm();

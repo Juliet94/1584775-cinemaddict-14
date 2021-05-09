@@ -3,31 +3,37 @@ import UserRatingView from './view/user-rating';
 import FooterStatisticsView from './view/footer-statistics';
 
 import FilmsListPresenter from './presenter/films-list';
+import FilterPresenter from './presenter/filter';
+
 import FilmsModel from './model/films';
+import FilterModel from './model/filter';
 
 import {FilmCount} from './const';
 import {generateFilmCard} from './mock/film-card';
 import {render} from './utils/render';
 
-import {generateFilters} from './mock/filter';
 import {generateUserRank} from './mock/user-rank';
 
 const filmCards = new Array(FilmCount.CONTENT).fill().map(generateFilmCard);
-const filters = generateFilters(filmCards);
 const userRank = generateUserRank(filmCards);
-
-const filmsModel = new FilmsModel();
-filmsModel.setFilms(filmCards);
 
 const siteMainElement = document.querySelector('.main');
 const siteHeaderElement = document.querySelector('.header');
 const siteFooterElement = document.querySelector('.footer');
 
 render(siteHeaderElement, new UserRatingView(userRank));
-render(siteMainElement, new MenuView(filters));
+render(siteMainElement, new MenuView());
 
-const filmsListPresenter = new FilmsListPresenter(siteMainElement, filmsModel);
+const siteNavElement = document.querySelector('.main-navigation');
 
+const filmsModel = new FilmsModel();
+const filterModel = new FilterModel();
+filmsModel.setFilms(filmCards);
+
+const filterPresenter = new FilterPresenter(siteNavElement, filterModel, filmsModel);
+const filmsListPresenter = new FilmsListPresenter(siteMainElement, filterModel, filmsModel);
+
+filterPresenter.init();
 filmsListPresenter.init();
 
 render(siteFooterElement, new FooterStatisticsView(filmCards.length));

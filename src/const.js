@@ -29,9 +29,9 @@ export const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
-// export const FilterType = {
-//   ALL: 'all',
-//   WATCHLIST: 'watchlist',
-//   HISTORY: 'history',
-//   FAVORITES: 'favorites',
-// };
+export const FilterType = {
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  HISTORY: 'history',
+  FAVORITES: 'favorites',
+};
