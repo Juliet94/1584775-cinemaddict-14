@@ -69,6 +69,7 @@ const getReleaseDate = () => {
 
 const generateComment = () => {
   return  {
+    id: nanoid(),
     text: getRandomArrayElement(Description.DESCRIPTIONS),
     author: getRandomArrayElement(NAMES),
     emoji: getRandomArrayElement(EMOTION),
