@@ -10,9 +10,11 @@ import NewCommentView from '../view/new-comment';
 import CommentCountView from '../view/comment-count';
 
 import {render, remove, replace, RenderPosition} from '../utils/render';
-import {getCommentLength, sortByRating, sortByDate} from '../utils/common';
+import {getCommentLength, sortByRating, sortByDate, getRandomArrayElement} from '../utils/common';
 import {FilmCount, SortType, UserAction, UpdateType, FilterType} from '../const';
 import {filter} from '../utils/filter';
+import {NAMES, getCommentDate} from '../mock/film-card';
+import {nanoid} from 'nanoid';
 
 const Title = {
   RATE : 'Top rated',
@@ -92,10 +94,13 @@ export default class FilmsList {
         break;
       case UserAction.ADD_COMMENT:
         this._filmsModel.addComment(updateType, update);
+        this._updateComments(update.filmCard);
+        this._replaceFilm(update.filmCard);
         break;
       case UserAction.DELETE_COMMENT:
         this._filmsModel.deleteComment(updateType, update);
         this._updateComments(update.filmCard);
+        this._replaceFilm(update.filmCard);
         break;
     }
   }
@@ -116,6 +121,7 @@ export default class FilmsList {
         break;
       case UpdateType.POPUP:
         this._updateComments(data);
+        this._replaceFilm(data);
         break;
     }
   }
@@ -311,6 +317,7 @@ export default class FilmsList {
     const commentsWrapperElement = this._popupComponent.getElement().querySelector('.film-details__comments-wrap');
     render(commentsWrapperElement, this._newCommentComponent);
     this._newCommentComponent.setEmojiChangeHandler();
+    this._newCommentComponent.setAddCommentKeydownHandler(() => this._handleCommentAddKeydown(filmCard));
   }
 
   _handleButtonWatchlistClick(filmCard) {
@@ -366,6 +373,25 @@ export default class FilmsList {
       {
         filmId: filmCard.id,
         commentId: comment.id,
+        filmCard,
+      },
+    );
+  }
+
+  _handleCommentAddKeydown(filmCard) {
+
+    this._handleViewAction(
+      UserAction.ADD_COMMENT,
+      UpdateType.POPUP,
+      {
+        filmId: filmCard.id,
+        comment: {
+          id: nanoid(),
+          text: this._newCommentComponent.getWrittenComment(),
+          author: getRandomArrayElement(NAMES),
+          emoji: this._newCommentComponent.getCheckedEmoji(),
+          date: getCommentDate(),
+        },
         filmCard,
       },
     );

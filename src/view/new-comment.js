@@ -44,16 +44,28 @@ export default class NewComment extends SmartView {
   constructor(filmCard) {
     super();
     this._data = filmCard;
+    this._emoji = null;
 
     this._emojiChangeHandler = this._emojiChangeHandler.bind(this);
+    this._addCommentKeydownHandler = this._addCommentKeydownHandler.bind(this);
   }
 
   getTemplate() {
     return createNewCommentTemplate(this._data);
   }
 
+  getCheckedEmoji() {
+    return `${this._emoji}.png`;
+  }
+
+  getWrittenComment() {
+    return this.getElement().querySelector('.film-details__comment-input').value;
+  }
+
   _emojiChangeHandler(evt) {
     evt.preventDefault();
+
+    this._emoji = evt.target.value;
 
     this.updateData({
       checkedEmoji: evt.target.value,
@@ -61,12 +73,29 @@ export default class NewComment extends SmartView {
     });
   }
 
+  _addCommentKeydownHandler(evt) {
+
+    if ((evt.ctrlKey && evt.code === 'Enter') &&
+      (this.getWrittenComment()) &&
+      (this._emoji)
+    ) {
+      this._callback.addComment();
+    }
+  }
+
   setEmojiChangeHandler() {
 
     this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._emojiChangeHandler);
   }
 
+  setAddCommentKeydownHandler(callback) {
+    this._callback.addComment = callback;
+
+    this.getElement().querySelector('.film-details__comment-input').addEventListener('keydown', this._addCommentKeydownHandler);
+  }
+
   restoreHandlers() {
     this.setEmojiChangeHandler();
+    this.setAddCommentKeydownHandler(this._callback.addComment);
   }
 }

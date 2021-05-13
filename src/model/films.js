@@ -30,16 +30,17 @@ export default class Films extends Observer {
     this._notify(updateType, update);
   }
 
-  // addComment(updateType, update) {
-  //   const filmIndex = this._films.findIndex((film) => film.id === update.id);
-  //
-  //   this._films[filmIndex].comments = [
-  //     ...this._films[filmIndex].comments,
-  //     update.comment,
-  //   ];
-  //
-  //   this._notify(updateType, update);
-  // }
+  addComment(updateType, update) {
+
+    const filmIndex = this._films.findIndex((film) => film.id === update.filmId);
+
+    this._films[filmIndex].comments = [
+      ...this._films[filmIndex].comments,
+      update.comment,
+    ];
+
+    this._notify(updateType, update.filmCard);
+  }
 
   deleteComment(updateType, update) {
 
