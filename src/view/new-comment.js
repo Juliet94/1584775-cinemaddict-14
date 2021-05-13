@@ -1,5 +1,6 @@
 import SmartView from './smart';
 import {Emoji} from '../const';
+import he from 'he';
 
 const createNewCommentTemplate = (filmCard) => {
   const {
@@ -59,7 +60,7 @@ export default class NewComment extends SmartView {
   }
 
   getWrittenComment() {
-    return this.getElement().querySelector('.film-details__comment-input').value;
+    return he.encode(this.getElement().querySelector('.film-details__comment-input').value);
   }
 
   _emojiChangeHandler(evt) {
@@ -68,7 +69,7 @@ export default class NewComment extends SmartView {
     this._emoji = evt.target.value;
 
     this.updateData({
-      checkedEmoji: evt.target.value,
+      checkedEmoji: this._emoji,
       writtenComment: this.getElement().querySelector('.film-details__comment-input').value,
     });
   }
