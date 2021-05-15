@@ -21,7 +21,7 @@ const POSTERS = [
   'the-man-with-the-golden-arm.jpg',
 ];
 const GENRES = ['Romance', 'Drama', 'Comedy', 'Musical', 'Horror', 'Cartoon', ' Mystery', 'Western'];
-const NAMES = ['John Doe', 'Jane Doe', 'John Roe', 'Jane Roe'];
+export const NAMES = ['John Doe', 'Jane Doe', 'John Roe', 'Jane Roe'];
 const EMOTION = ['angry.png', 'puke.png', 'sleeping.png', 'smile.png'];
 const COMMENT_COUNT = 5;
 const COUNTRIES = ['USA', 'Russia', 'France', 'England', 'Germany'];
@@ -55,7 +55,7 @@ const getFilmDuration =() => {
   return `${getRandomInteger(FilmDuration.MIN_H, FilmDuration.MAX_H)}h ${getRandomInteger(FilmDuration.MIN_M, FilmDuration.MAX_M)}m`;
 };
 
-const getCommentDate = () => {
+export const getCommentDate = () => {
   return dayjs().format('YYYY[/]/MM[/]DD HH[:]mm');
 };
 
@@ -69,6 +69,7 @@ const getReleaseDate = () => {
 
 const generateComment = () => {
   return  {
+    id: nanoid(),
     text: getRandomArrayElement(Description.DESCRIPTIONS),
     author: getRandomArrayElement(NAMES),
     emoji: getRandomArrayElement(EMOTION),

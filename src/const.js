@@ -4,7 +4,7 @@ export const SortType = {
   RATING: 'rating',
 };
 
-export const TaskCount = {
+export const FilmCount = {
   CONTENT : 23,
   EXTRA : 2,
   PER_STEP : 5,
@@ -15,4 +15,24 @@ export const Emoji = {
   SLEEPING: 'sleeping',
   PUKE: 'puke',
   ANGRY: 'angry',
+};
+
+export const UserAction = {
+  UPDATE_FILM: 'UPDATE_FILM',
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+  POPUP: 'POPUP',
+};
+
+export const FilterType = {
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  HISTORY: 'history',
+  FAVORITES: 'favorites',
 };
