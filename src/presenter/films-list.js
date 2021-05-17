@@ -13,8 +13,9 @@ import {render, remove, replace, RenderPosition} from '../utils/render';
 import {getCommentLength, sortByRating, sortByDate, getRandomArrayElement} from '../utils/common';
 import {FilmCount, SortType, UserAction, UpdateType, FilterType} from '../const';
 import {filter} from '../utils/filter';
-import {NAMES, getCommentDate} from '../mock/film-card';
+import {NAMES} from '../mock/film-card';
 import {nanoid} from 'nanoid';
+import dayjs from 'dayjs';
 
 const Title = {
   RATE : 'Top rated',
@@ -390,7 +391,7 @@ export default class FilmsList {
           text: this._newCommentComponent.getWrittenComment(),
           author: getRandomArrayElement(NAMES),
           emoji: this._newCommentComponent.getCheckedEmoji(),
-          date: getCommentDate(),
+          date: dayjs(),
         },
         filmCard,
       },

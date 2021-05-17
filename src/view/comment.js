@@ -1,4 +1,5 @@
 import AbstractView from './abstract';
+import {formatCommentDate} from '../utils/film-card';
 
 const createCommentTemplate = (comments) => {
 
@@ -17,7 +18,7 @@ const createCommentTemplate = (comments) => {
               <p class="film-details__comment-text">${text}</p>
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${author}</span>
-                <span class="film-details__comment-day">${date}</span>
+                <span class="film-details__comment-day">${formatCommentDate(date)}</span>
                 <button class="film-details__comment-delete">Delete</button>
               </p>
             </div>

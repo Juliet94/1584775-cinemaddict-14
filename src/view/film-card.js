@@ -1,4 +1,5 @@
 import {getCommentLength} from '../utils/common';
+import {getReleaseYear, formatFilmDuration} from '../utils/film-card';
 import AbstractView from './abstract';
 
 const createFilmCardTemplate = (filmCard) => {
@@ -32,8 +33,8 @@ const createFilmCardTemplate = (filmCard) => {
           <h3 class="film-card__title">${title}</h3>
           <p class="film-card__rating">${rate}</p>
           <p class="film-card__info">
-            <span class="film-card__year">${production.slice(-4)}</span>
-            <span class="film-card__duration">${duration}</span>
+            <span class="film-card__year">${getReleaseYear(production)}</span>
+            <span class="film-card__duration">${formatFilmDuration(duration)}</span>
             <span class="film-card__genre">${genres[0]}</span>
           </p>
           <img src="./images/posters/${poster}" alt="" class="film-card__poster">
