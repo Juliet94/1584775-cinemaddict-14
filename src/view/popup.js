@@ -1,4 +1,5 @@
 import AbstractView from './abstract';
+import {formatFilmDuration, formatReleaseDate} from '../utils/film-card';
 
 const createPopupTemplate = (filmCard) => {
 
@@ -60,11 +61,11 @@ const createPopupTemplate = (filmCard) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${production}</td>
+              <td class="film-details__cell">${formatReleaseDate(production)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${duration}</td>
+              <td class="film-details__cell">${formatFilmDuration(duration)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>

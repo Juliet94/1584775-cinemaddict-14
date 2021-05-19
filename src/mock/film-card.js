@@ -40,23 +40,15 @@ const Description = {
   ],
   DESC_COUNT : 5,
 };
+
 const FilmDuration = {
-  MIN_H : 0,
-  MAX_H: 3,
-  MIN_M: 5,
-  MAX_M: 59,
+  MIN : 0,
+  MAX: 200,
 };
+
 const ReleaseDate = {
   YEAR: [dayjs().year(), 1900],
   MONTH: [11, 0],
-};
-
-const getFilmDuration =() => {
-  return `${getRandomInteger(FilmDuration.MIN_H, FilmDuration.MAX_H)}h ${getRandomInteger(FilmDuration.MIN_M, FilmDuration.MAX_M)}m`;
-};
-
-export const getCommentDate = () => {
-  return dayjs().format('YYYY[/]/MM[/]DD HH[:]mm');
 };
 
 const getReleaseDate = () => {
@@ -64,7 +56,7 @@ const getReleaseDate = () => {
   const month = getRandomInteger(...ReleaseDate.MONTH);
   const day = getRandomInteger(dayjs(month).daysInMonth());
 
-  return dayjs(new Date(year, month, day)).format('DD MMMM YYYY');
+  return dayjs(new Date(year, month, day));
 };
 
 const generateComment = () => {
@@ -73,7 +65,7 @@ const generateComment = () => {
     text: getRandomArrayElement(Description.DESCRIPTIONS),
     author: getRandomArrayElement(NAMES),
     emoji: getRandomArrayElement(EMOTION),
-    date: getCommentDate(),
+    date: dayjs(),
   };
 };
 
@@ -86,7 +78,7 @@ const generateFilmCard = () => {
     description: getRandomArray(Description.DESCRIPTIONS, Description.DESC_COUNT).join(' '),
     rate: getRandomFloat(),
     production: getReleaseDate(),
-    duration: getFilmDuration(),
+    duration: getRandomInteger(FilmDuration.MIN, FilmDuration.MAX),
     genres : getRandomArray(GENRES),
     isWatched : Boolean(getRandomInteger()),
     isFavorite : Boolean(getRandomInteger()),
