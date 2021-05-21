@@ -8,32 +8,41 @@ import FilterPresenter from './presenter/filter';
 import FilmsModel from './model/films';
 import FilterModel from './model/filter';
 
-import {FilmCount} from './const';
-import {generateFilmCard} from './mock/film-card';
+import Api from './api';
+
 import {render} from './utils/render';
+import {UpdateType} from './const';
 
 import {generateUserRank} from './mock/user-rank';
 
-const filmCards = new Array(FilmCount.CONTENT).fill().map(generateFilmCard);
-const userRank = generateUserRank(filmCards);
+const AUTHORIZATION = 'Basic ef5rg3eg154d16sg';
+const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
+
+const filmsModel = new FilmsModel();
+const filterModel = new FilterModel();
+// const userRank = generateUserRank(filmsModel.getFilms());
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const siteMainElement = document.querySelector('.main');
 const siteHeaderElement = document.querySelector('.header');
 const siteFooterElement = document.querySelector('.footer');
 
-render(siteHeaderElement, new UserRatingView(userRank));
 render(siteMainElement, new MenuView());
 
 const siteNavElement = document.querySelector('.main-navigation');
 
-const filmsModel = new FilmsModel();
-const filterModel = new FilterModel();
-filmsModel.setFilms(filmCards);
-
 const filterPresenter = new FilterPresenter(siteNavElement, filterModel, filmsModel);
-const filmsListPresenter = new FilmsListPresenter(siteMainElement, filterModel, filmsModel);
+const filmsListPresenter = new FilmsListPresenter(siteMainElement, filterModel, filmsModel, api);
 
 filterPresenter.init();
 filmsListPresenter.init();
 
-render(siteFooterElement, new FooterStatisticsView(filmCards.length));
+api.getFilms()
+  .then((films) => {
+    filmsModel.setFilms(UpdateType.INIT, films);
+    render(siteHeaderElement, new UserRatingView(generateUserRank(films)));
+    render(siteFooterElement, new FooterStatisticsView(films.length));
+  })
+  .catch(() => {
+    filmsModel.setFilms(UpdateType.INIT, []);
+  });
