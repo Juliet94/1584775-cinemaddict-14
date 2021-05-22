@@ -5,7 +5,6 @@ export const SortType = {
 };
 
 export const FilmCount = {
-  CONTENT : 23,
   EXTRA : 2,
   PER_STEP : 5,
 };
@@ -28,6 +27,7 @@ export const UpdateType = {
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   POPUP: 'POPUP',
+  INIT: 'INIT',
 };
 
 export const FilterType = {

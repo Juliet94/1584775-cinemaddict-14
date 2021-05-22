@@ -8,6 +8,7 @@ import CommentView from '../view/comment';
 import NoFilmView from '../view/no-film';
 import NewCommentView from '../view/new-comment';
 import CommentCountView from '../view/comment-count';
+import LoadingView from '../view/loading';
 
 import {render, remove, replace, RenderPosition} from '../utils/render';
 import {getCommentLength, sortByRating, sortByDate, getRandomArrayElement, sortByCommentsLength} from '../utils/common';
@@ -28,10 +29,12 @@ const AdditionalClass = {
 };
 
 export default class FilmsList {
-  constructor(filmsListContainer, filterModel, filmsModel) {
+  constructor(filmsListContainer, filterModel, filmsModel, api) {
 
     this._filmsModel = filmsModel;
     this._filterModel = filterModel;
+
+    this._api = api;
 
     this._filmsListContainer = filmsListContainer;
     this._renderedFilmCount = FilmCount.PER_STEP;
@@ -40,6 +43,8 @@ export default class FilmsList {
     this._renderedMostCommented = {};
     this._renderedComments = [];
     this._currentSortType = SortType.DEFAULT;
+    this._isLoading = true;
+    this._comments = [];
 
     this._filmsListComponent = new FilmsListView();
     this._sortComponent = new SortView();
@@ -47,6 +52,7 @@ export default class FilmsList {
     this._buttonShowMoreComponent = new ButtonShowMoreView();
     this._topRatedComponent = new FilmsListExtraView(Title.RATE, AdditionalClass.RATED);
     this._mostCommentedComponent = new FilmsListExtraView(Title.COMMENT, AdditionalClass.COMMENTED);
+    this._loadingComponent = new LoadingView();
 
     this._filmCardComponent = null;
     this._popupComponent = null;
@@ -54,6 +60,7 @@ export default class FilmsList {
     this._commentComponent = null;
     this._commentCountComponent = null;
 
+    this._handleOpenPopupClick = this._handleOpenPopupClick.bind(this);
     this._handleButtonShowMoreClick = this._handleButtonShowMoreClick.bind(this);
     this._handleButtonWatchlistClick = this._handleButtonWatchlistClick.bind(this);
     this._handleButtonWatchedClick = this._handleButtonWatchedClick.bind(this);
@@ -94,8 +101,10 @@ export default class FilmsList {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update);
-        this._replaceFilm(update);
+        this._api.updateFilm(update).then((response) => {
+          this._filmsModel.updateFilm(updateType, response);
+          this._replaceFilm(response);
+        });
         break;
       case UserAction.ADD_COMMENT:
         this._filmsModel.addComment(updateType, update);
@@ -127,6 +136,11 @@ export default class FilmsList {
       case UpdateType.POPUP:
         this._updateComments(data);
         this._replaceFilm(data);
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderFilmsList();
         break;
     }
   }
@@ -186,7 +200,7 @@ export default class FilmsList {
 
     this._filmCardComponent = new FilmCardView(filmCard);
 
-    this._filmCardComponent.setOpenPopupClickHandler(() => this._renderPopup(filmCard));
+    this._filmCardComponent.setOpenPopupClickHandler(() => this._handleOpenPopupClick(filmCard));
     this._filmCardComponent.setWatchlistClickHandler(() => this._handleButtonWatchlistClick(filmCard));
     this._filmCardComponent.setWatchedClickHandler(() => this._handleButtonWatchedClick(filmCard));
     this._filmCardComponent.setFavoriteClickHandler(() => this._handleButtonFavoriteClick(filmCard));
@@ -207,6 +221,10 @@ export default class FilmsList {
 
   _renderNoFilm() {
     render(this._filmsListContainer, this._noFilmComponent);
+  }
+
+  _renderLoading() {
+    render(this._filmsListContainer, this._loadingComponent);
   }
 
   _handleButtonShowMoreClick() {
@@ -270,6 +288,11 @@ export default class FilmsList {
 
   _renderFilmsList() {
 
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const filmCount = this._getFilms().length;
 
     if (filmCount !== 0) {
@@ -330,8 +353,8 @@ export default class FilmsList {
 
     const commentListElement = this._popupComponent.getElement().querySelector('.film-details__comments-list');
 
-    for (let i = 0; i < getCommentLength(filmCard.comments); i++) {
-      this._commentComponent = new CommentView(filmCard.comments[i]);
+    for (let i = 0; i < this._comments.length; i++) {
+      this._commentComponent = new CommentView(this._comments[i]);
       this._renderedComments.push(this._commentComponent);
       render(commentListElement, this._commentComponent);
       this._commentComponent.setDeleteCommentClickHandler(() => this._handleCommentDeleteClick(filmCard, filmCard.comments[i]));
@@ -352,6 +375,18 @@ export default class FilmsList {
     render(commentsWrapperElement, this._newCommentComponent);
     this._newCommentComponent.setEmojiChangeHandler();
     this._newCommentComponent.setAddCommentKeydownHandler(() => this._handleCommentAddKeydown(filmCard));
+  }
+
+  _handleOpenPopupClick(filmCard) {
+    this._api.getComments(filmCard.id)
+      .then((comments) => {
+        this._comments = comments;
+        this._renderPopup(filmCard);
+      })
+      .catch(() => {
+        this._comments = [];
+        this._renderPopup([]);
+      });
   }
 
   _handleButtonWatchlistClick(filmCard) {
