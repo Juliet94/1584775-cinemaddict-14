@@ -1,3 +1,9 @@
+export const UserRank = {
+  NOVICE: 'Novice',
+  FAN: 'Fan',
+  MOVIE_BUFF: 'Movie Buff',
+};
+
 export const SortType = {
   DEFAULT: 'default',
   DATE: 'date',
@@ -36,3 +42,13 @@ export const FilterType = {
   HISTORY: 'history',
   FAVORITES: 'favorites',
 };
+
+export const StatsPeriod = {
+  ALL_TIME: 'all-time',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};
+
+export const NAV_ACTIVE_CLASS = 'main-navigation__item--active';

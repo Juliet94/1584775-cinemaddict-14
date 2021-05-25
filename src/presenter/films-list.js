@@ -17,6 +17,7 @@ import {filter} from '../utils/filter';
 import {NAMES} from '../mock/film-card';
 import {nanoid} from 'nanoid';
 import dayjs from 'dayjs';
+import UserRatingView from '../view/user-rating';
 
 const Title = {
   RATE : 'Top rated',
@@ -29,7 +30,7 @@ const AdditionalClass = {
 };
 
 export default class FilmsList {
-  constructor(filmsListContainer, filterModel, filmsModel, api) {
+  constructor(filmsListContainer, userRankContainer, filterModel, filmsModel, api) {
 
     this._filmsModel = filmsModel;
     this._filterModel = filterModel;
@@ -37,6 +38,7 @@ export default class FilmsList {
     this._api = api;
 
     this._filmsListContainer = filmsListContainer;
+    this._userRankContainer = userRankContainer;
     this._renderedFilmCount = FilmCount.PER_STEP;
     this._renderedFilmCards = {};
     this._renderedTopRated = {};
@@ -54,6 +56,7 @@ export default class FilmsList {
     this._mostCommentedComponent = new FilmsListExtraView(Title.COMMENT, AdditionalClass.COMMENTED);
     this._loadingComponent = new LoadingView();
 
+    this._userRankComponent = null;
     this._filmCardComponent = null;
     this._popupComponent = null;
     this._newCommentComponent = null;
@@ -80,6 +83,17 @@ export default class FilmsList {
     this._filterModel.addObserver(this._handleModelEvent);
 
     this._renderFilmsList();
+  }
+
+  destroy() {
+    this._clearFilmList({resetSortType: true});
+
+    remove(this._sortComponent);
+    remove(this._topRatedComponent);
+    remove(this._mostCommentedComponent);
+
+    this._filmsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
   }
 
   _getFilms() {
@@ -227,6 +241,16 @@ export default class FilmsList {
     render(this._filmsListContainer, this._loadingComponent);
   }
 
+  _renderUserRank() {
+
+    if (this._userRankComponent) {
+      remove(this._userRankComponent);
+    }
+
+    this._userRankComponent = new UserRatingView(this._filmsModel.getFilms());
+    render(this._userRankContainer, this._userRankComponent);
+  }
+
   _handleButtonShowMoreClick() {
 
     const filmCount = this._getFilms().length;
@@ -296,6 +320,7 @@ export default class FilmsList {
     const filmCount = this._getFilms().length;
 
     if (filmCount !== 0) {
+      this._renderUserRank();
       this._renderSort();
       render(this._filmsListContainer, this._filmsListComponent);
       this._renderFilmCards();
@@ -403,6 +428,9 @@ export default class FilmsList {
   _handleButtonWatchedClick(filmCard) {
 
     filmCard.isWatched = !filmCard.isWatched;
+    filmCard.watchingDate = filmCard.isWatched ? dayjs().format() : null;
+
+    this._renderUserRank();
 
     if (this._filterModel.getFilter() === FilterType.ALL) {
       this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.PATCH, filmCard);

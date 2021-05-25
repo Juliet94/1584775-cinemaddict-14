@@ -1,5 +1,5 @@
 import AbstractView from './abstract';
-import {FilterType} from '../const';
+import {FilterType, NAV_ACTIVE_CLASS} from '../const';
 
 const createFilterItemTemplate = (filters, currentFilterType) => {
 
@@ -16,7 +16,7 @@ const createFilterItemTemplate = (filters, currentFilterType) => {
     return `<span class="main-navigation__item-count">${count}</span>`;
   };
 
-  return `<a href="#${type}" class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}"
+  return `<a href="#${type}" class="main-navigation__item ${type === currentFilterType ? NAV_ACTIVE_CLASS : ''}"
     data-type="${type}">
     ${name}
     ${getCount()}
@@ -44,6 +44,12 @@ export default class Filter extends AbstractView {
 
   getTemplate() {
     return createFilterTemplate(this._filters, this._currentFilterType);
+  }
+
+  removeActiveClass() {
+    this.getElement().querySelectorAll('.main-navigation__item').forEach((button) => {
+      button.classList.remove(NAV_ACTIVE_CLASS);
+    });
   }
 
   _filterClickHandler(evt) {
