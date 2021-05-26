@@ -15,4 +15,8 @@ export default class Filter extends Observer {
   getFilter() {
     return this._activeFilter;
   }
+
+  resetActiveFilter() {
+    this._activeFilter = undefined;
+  }
 }

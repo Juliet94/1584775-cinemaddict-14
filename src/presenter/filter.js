@@ -48,7 +48,9 @@ export default class Filter {
       this._filterContainer.querySelector('.main-navigation__additional').classList.remove(NAV_ACTIVE_CLASS);
       remove(this._statsComponent);
       this._isStatsShown = false;
+      this._filterModel.setFilter(UpdateType.MAJOR, filterType);
       this._filmsListPresenter.init();
+      return;
     }
 
     if (this._filterModel.getFilter() === filterType) {
@@ -100,5 +102,9 @@ export default class Filter {
 
   setStats(stats) {
     this._statsComponent = stats;
+  }
+
+  resetActiveFilter() {
+    this._filterModel.resetActiveFilter();
   }
 }

@@ -15,6 +15,8 @@ const getGenresData = (films, period) => {
 
   if (datePeriod) {
     films = films.filter((film) => isAfter(film.watchingDate, datePeriod));
+  } else {
+    films = films.filter((film) => film.watchingDate);
   }
 
   films.forEach((film) => {

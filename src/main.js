@@ -43,6 +43,7 @@ const handleStatsClick = () => {
       statsComponent.setChart();
     });
     filterPresenter.setStats(statsComponent);
+    filterPresenter.resetActiveFilter();
 
     filmsListPresenter.destroy();
     render(siteMainElement, statsComponent);
