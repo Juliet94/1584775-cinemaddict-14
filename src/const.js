@@ -52,3 +52,5 @@ export const StatsPeriod = {
 };
 
 export const NAV_ACTIVE_CLASS = 'main-navigation__item--active';
+
+export const SHAKE_ANIMATION_TIMEOUT = 600;

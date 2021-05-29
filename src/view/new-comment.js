@@ -1,5 +1,5 @@
 import SmartView from './smart';
-import {Emoji} from '../const';
+import {Emoji, SHAKE_ANIMATION_TIMEOUT} from '../const';
 import he from 'he';
 
 const createNewCommentTemplate = (filmCard) => {
@@ -56,7 +56,7 @@ export default class NewComment extends SmartView {
   }
 
   getCheckedEmoji() {
-    return `${this._emoji}.png`;
+    return this._emoji;
   }
 
   getWrittenComment() {
@@ -95,8 +95,23 @@ export default class NewComment extends SmartView {
     this.getElement().querySelector('.film-details__comment-input').addEventListener('keydown', this._addCommentKeydownHandler);
   }
 
+  disableForm() {
+    this.getElement().querySelector('.film-details__comment-input').setAttribute('disabled', 'disabled');
+  }
+
+  activateForm() {
+    this.getElement().querySelector('.film-details__comment-input').removeAttribute('disabled');
+  }
+
   restoreHandlers() {
     this.setEmojiChangeHandler();
     this.setAddCommentKeydownHandler(this._callback.addComment);
+  }
+
+  shake() {
+    this.getElement().querySelector('.film-details__comment-input').style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    setTimeout(() => {
+      this.getElement().querySelector('.film-details__comment-input').style.animation = '';
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 }

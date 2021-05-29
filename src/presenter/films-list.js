@@ -11,11 +11,9 @@ import CommentCountView from '../view/comment-count';
 import LoadingView from '../view/loading';
 
 import {render, remove, replace, RenderPosition} from '../utils/render';
-import {getCommentLength, sortByRating, sortByDate, getRandomArrayElement, sortByCommentsLength} from '../utils/common';
+import {getCommentLength, sortByRating, sortByDate, sortByCommentsLength} from '../utils/common';
 import {FilmCount, SortType, UserAction, UpdateType, FilterType} from '../const';
 import {filter} from '../utils/filter';
-import {NAMES} from '../mock/film-card';
-import {nanoid} from 'nanoid';
 import dayjs from 'dayjs';
 import UserRatingView from '../view/user-rating';
 
@@ -113,6 +111,7 @@ export default class FilmsList {
   }
 
   _handleViewAction(actionType, updateType, update) {
+
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this._api.updateFilm(update).then((response) => {
@@ -121,14 +120,28 @@ export default class FilmsList {
         });
         break;
       case UserAction.ADD_COMMENT:
-        this._filmsModel.addComment(updateType, update);
-        this._updateComments(update.filmCard);
-        this._replaceFilm(update.filmCard);
+        this._api.addComment(update).then((response) => {
+          this._filmsModel.addComment(updateType, update, response.id);
+          this._updateComments(update.filmCard);
+          this._replaceFilm(update.filmCard);
+        })
+          .catch(() => {
+            this._newCommentComponent.activateForm();
+            this._newCommentComponent.shake();
+          });
         break;
       case UserAction.DELETE_COMMENT:
-        this._filmsModel.deleteComment(updateType, update);
-        this._updateComments(update.filmCard);
-        this._replaceFilm(update.filmCard);
+        this._api.deleteComment(update)
+          .then(() => {
+            this._filmsModel.deleteComment(updateType, update);
+            this._updateComments(update.filmCard);
+            this._replaceFilm(update.filmCard);
+          })
+          .catch(() => {
+            const commentIndex = this._renderedComments.findIndex((comment) => comment._comments.id === update.commentId);
+            this._renderedComments[commentIndex].setStateDeleting(false);
+            this._renderedComments[commentIndex].shake();
+          });
         break;
     }
   }
@@ -148,7 +161,6 @@ export default class FilmsList {
         this._renderFilmCards();
         break;
       case UpdateType.POPUP:
-        this._updateComments(data);
         this._replaceFilm(data);
         break;
       case UpdateType.INIT:
@@ -387,7 +399,9 @@ export default class FilmsList {
       this._commentComponent = new CommentView(this._comments[i]);
       this._renderedComments.push(this._commentComponent);
       render(commentListElement, this._commentComponent);
-      this._commentComponent.setDeleteCommentClickHandler(() => this._handleCommentDeleteClick(filmCard, filmCard.comments[i]));
+      this._commentComponent.setDeleteCommentClickHandler(() => {
+        this._handleCommentDeleteClick(filmCard, filmCard.comments[i]);
+      });
     }
   }
 
@@ -404,10 +418,14 @@ export default class FilmsList {
     const commentsWrapperElement = this._popupComponent.getElement().querySelector('.film-details__comments-wrap');
     render(commentsWrapperElement, this._newCommentComponent);
     this._newCommentComponent.setEmojiChangeHandler();
-    this._newCommentComponent.setAddCommentKeydownHandler(() => this._handleCommentAddKeydown(filmCard));
+    this._newCommentComponent.setAddCommentKeydownHandler(() => {
+      this._newCommentComponent.disableForm();
+      this._handleCommentAddKeydown(filmCard);
+    });
   }
 
   _handleOpenPopupClick(filmCard) {
+
     this._api.getComments(filmCard.id)
       .then((comments) => {
         this._comments = comments;
@@ -472,7 +490,7 @@ export default class FilmsList {
       UpdateType.POPUP,
       {
         filmId: filmCard.id,
-        commentId: comment.id,
+        commentId: comment,
         filmCard,
       },
     );
@@ -486,11 +504,8 @@ export default class FilmsList {
       {
         filmId: filmCard.id,
         comment: {
-          id: nanoid(),
           text: this._newCommentComponent.getWrittenComment(),
-          author: getRandomArrayElement(NAMES),
           emoji: this._newCommentComponent.getCheckedEmoji(),
-          date: dayjs(),
         },
         filmCard,
       },
@@ -523,16 +538,24 @@ export default class FilmsList {
 
   _updateComments(filmCard) {
 
-    this._renderedComments.forEach((comment) => {
-      remove(comment);
-    });
-    remove(this._commentCountComponent);
-    this._renderedComments = [];
-    this._renderCommentCount(filmCard);
-    this._renderComments(filmCard);
-    this._renderNewComment(filmCard);
+    this._api.getComments(filmCard.id)
+      .then((comments) => {
+        this._renderedComments.forEach((comment) => {
+          remove(comment);
+        });
+        remove(this._commentCountComponent);
+        this._renderedComments = [];
+        this._comments = [];
+        this._clearMostCommented();
 
-    this._clearMostCommented();
-    this._renderMostCommentedFilms();
+        this._comments = comments;
+        this._renderCommentCount(filmCard);
+        this._renderComments(filmCard);
+        this._renderNewComment(filmCard);
+        this._renderMostCommentedFilms();
+      })
+      .catch(() => {
+        this._comments = [];
+      });
   }
 }

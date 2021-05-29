@@ -32,13 +32,13 @@ export default class Films extends Observer {
     this._notify(updateType, update);
   }
 
-  addComment(updateType, update) {
+  addComment(updateType, update, response) {
 
     const filmIndex = this._films.findIndex((film) => film.id === update.filmId);
 
     this._films[filmIndex].comments = [
       ...this._films[filmIndex].comments,
-      update.comment,
+      response,
     ];
 
     this._notify(updateType, update.filmCard);
@@ -48,7 +48,7 @@ export default class Films extends Observer {
 
     const filmIndex = this._films.findIndex((film) => film.id === update.filmId);
 
-    const commentIndex = this._films[filmIndex].comments.findIndex((comment) => comment.id === update.commentId);
+    const commentIndex = this._films[filmIndex].comments.findIndex((comment) => comment === update.commentId);
 
     if (commentIndex === -1) {
       throw new Error('Can\'t delete unexisting comment');
@@ -160,5 +160,22 @@ export default class Films extends Observer {
     delete adaptedFilm.isFavorite;
 
     return adaptedFilm;
+  }
+
+  static adaptCommentToServer(comment) {
+
+    const adaptedComment = Object.assign(
+      {},
+      comment,
+      {
+        comment: comment.text,
+        emotion: comment.emoji,
+      },
+    );
+
+    delete adaptedComment.text;
+    delete adaptedComment.emoji;
+
+    return adaptedComment;
   }
 }
