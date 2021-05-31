@@ -47,12 +47,12 @@ export default class FilmsList {
     this._comments = [];
 
     this._filmsListComponent = new FilmsListView();
-    this._sortComponent = new SortView();
     this._buttonShowMoreComponent = new ButtonShowMoreView();
     this._topRatedComponent = new FilmsListExtraView(Title.RATE, AdditionalClass.RATED);
     this._mostCommentedComponent = new FilmsListExtraView(Title.COMMENT, AdditionalClass.COMMENTED);
     this._loadingComponent = new LoadingView();
 
+    this._sortComponent = null;
     this._noFilmComponent = null;
     this._userRankComponent = null;
     this._filmCardComponent = null;
@@ -158,7 +158,15 @@ export default class FilmsList {
         break;
       case UpdateType.MAJOR:
         this._clearFilmList({resetSortType: true});
+
+        if (this._getFilms().length === 0) {
+          this._renderNoFilm();
+          return;
+        }
+
+        this._renderSort();
         this._renderFilmCards();
+
         break;
       case UpdateType.POPUP:
         this._replaceFilm(data);
@@ -172,7 +180,15 @@ export default class FilmsList {
   }
 
   _renderSort() {
-    render(this._filmsListContainer, this._sortComponent);
+
+    if (this._sortComponent) {
+      remove(this._sortComponent);
+    }
+
+    this._sortComponent = new SortView();
+    const filterContainer = document.querySelector('.main-navigation');
+
+    render(filterContainer, this._sortComponent, RenderPosition.AFTEREND);
     this._sortComponent.setSortTypeClickHandler(this._handleSortTypeClick);
   }
 
@@ -250,8 +266,13 @@ export default class FilmsList {
   }
 
   _renderNoFilm() {
+
+    if (this._sortComponent) {
+      remove(this._sortComponent);
+    }
+
     this._noFilmComponent = new NoFilmView();
-    render(this._filmsListContainer, this._noFilmComponent);
+    render(this._filmsListElement, this._noFilmComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderLoading() {
@@ -336,7 +357,7 @@ export default class FilmsList {
 
     const filmCount = this._getFilms().length;
 
-    if (filmCount !== 0) {
+    if (filmCount) {
       this._renderUserRank();
       this._renderSort();
       render(this._filmsListContainer, this._filmsListComponent);
@@ -344,6 +365,7 @@ export default class FilmsList {
       this._renderTopRatedFilms();
       this._renderMostCommentedFilms();
     } else {
+      render(this._filmsListContainer, this._filmsListComponent);
       this._renderNoFilm();
     }
   }
@@ -424,6 +446,15 @@ export default class FilmsList {
     });
   }
 
+  _defineUpdateType(filmCard) {
+
+    if (this._filterModel.getFilter() === FilterType.ALL) {
+      this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.PATCH, filmCard);
+    } else {
+      this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.MINOR, filmCard);
+    }
+  }
+
   _handleOpenPopupClick(filmCard) {
 
     this._api.getComments(filmCard.id)
@@ -438,14 +469,8 @@ export default class FilmsList {
   }
 
   _handleButtonWatchlistClick(filmCard) {
-
     filmCard.isInWatchlist = !filmCard.isInWatchlist;
-
-    if (this._filterModel.getFilter() === FilterType.ALL) {
-      this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.PATCH, filmCard);
-    } else {
-      this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.MINOR, filmCard);
-    }
+    this._defineUpdateType(filmCard);
   }
 
   _handleButtonWatchedClick(filmCard) {
@@ -454,23 +479,12 @@ export default class FilmsList {
     filmCard.watchingDate = filmCard.isWatched ? dayjs().format() : null;
 
     this._renderUserRank();
-
-    if (this._filterModel.getFilter() === FilterType.ALL) {
-      this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.PATCH, filmCard);
-    } else {
-      this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.MINOR, filmCard);
-    }
+    this._defineUpdateType(filmCard);
   }
 
   _handleButtonFavoriteClick(filmCard) {
-
     filmCard.isFavorite = !filmCard.isFavorite;
-
-    if (this._filterModel.getFilter() === FilterType.ALL) {
-      this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.PATCH, filmCard);
-    } else {
-      this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.MINOR, filmCard);
-    }
+    this._defineUpdateType(filmCard);
   }
 
   _handleSortTypeClick(sortType) {

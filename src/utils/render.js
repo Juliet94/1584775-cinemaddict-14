@@ -3,6 +3,7 @@ import Abstract from '../view/abstract';
 export const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
   BEFOREEND: 'beforeend',
+  AFTEREND: 'afterend',
 };
 
 export const render = (container, element, place = RenderPosition.BEFOREEND) => {
@@ -21,6 +22,8 @@ export const render = (container, element, place = RenderPosition.BEFOREEND) => 
     case RenderPosition.BEFOREEND:
       container.append(element);
       break;
+    case RenderPosition.AFTEREND:
+      container.after(element);
   }
 };
 

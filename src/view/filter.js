@@ -53,8 +53,16 @@ export default class Filter extends AbstractView {
   }
 
   _filterClickHandler(evt) {
+
     evt.preventDefault();
-    this._callback.filterClick(evt.target.dataset.type);
+
+    if (evt.target.tagName === 'SPAN') {
+      this._callback.filterClick(evt.target.parentElement.dataset.type);
+    }
+
+    if (evt.target.dataset.type) {
+      this._callback.filterClick(evt.target.dataset.type);
+    }
   }
 
   setFilterClickHandler(callback) {

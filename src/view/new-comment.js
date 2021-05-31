@@ -60,7 +60,7 @@ export default class NewComment extends SmartView {
   }
 
   getWrittenComment() {
-    return he.encode(this.getElement().querySelector('.film-details__comment-input').value);
+    return he.encode(this.getElement().querySelector('.film-details__comment-input').value.trim());
   }
 
   _emojiChangeHandler(evt) {
@@ -76,7 +76,7 @@ export default class NewComment extends SmartView {
 
   _addCommentKeydownHandler(evt) {
 
-    if ((evt.ctrlKey && evt.code === 'Enter') &&
+    if (((evt.ctrlKey || evt.metaKey) && evt.code === 'Enter') &&
       (this.getWrittenComment()) &&
       (this._emoji)
     ) {

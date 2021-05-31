@@ -2,10 +2,10 @@ import {getCommentLength} from '../utils/common';
 import {getReleaseYear, formatFilmDuration} from '../utils/film-card';
 import AbstractView from './abstract';
 
-const createFilmCardTemplate = (filmCard) => {
+const DESC_LENGTH = 140;
+const ACTIVE_CLASS = 'film-card__controls-item--active';
 
-  const DESC_LENGTH = 140;
-  const ACTIVE_CLASS = 'film-card__controls-item--active';
+const createFilmCardTemplate = (filmCard) => {
 
   const {
     title,
