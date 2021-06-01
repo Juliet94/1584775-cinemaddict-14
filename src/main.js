@@ -7,7 +7,6 @@ import FilterPresenter from './presenter/filter';
 
 import FilmsModel from './model/films';
 import FilterModel from './model/filter';
-
 import Api from './api';
 
 import {render} from './utils/render';
