@@ -3,13 +3,6 @@
 * Студент: [Анастасия Агеева](https://up.htmlacademy.ru/ecmascript/14/user/1584775).
 * Наставник: [Дмитрий Гуляев](https://htmlacademy.ru/profile/dima).
 
----
-
-_Не удаляйте и не изменяйте папки и файлы:_
-_`.editorconfig`, `.gitattributes`._
-
----
-
 ### Памятка
 
 #### 1. Зарегистрируйтесь на Гитхабе
